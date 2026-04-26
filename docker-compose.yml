@@ -1,0 +1,47 @@
+# version: "3.9"
+
+services:
+
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    command:
+      - "--api.dashboard=true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml
+      - ./traefik/acme.json:/acme.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dashboard.rule=Host(`traefik.localhost`)"
+      - "traefik.http.routers.dashboard.service=api@internal"
+      - "traefik.http.routers.dashboard.entrypoints=websecure"
+      - "traefik.http.routers.dashboard.tls.certresolver=letsencrypt"
+
+  portal-upload:
+    build: ./portal-upload
+    container_name: portal-upload
+
+    # AQUI SIM — expõe a porta 3000 do portal
+    ports:
+      - "3000:3000"
+
+    environment:
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+      OWNER: ${OWNER}
+      REPO: ${REPO}
+
+      MAX_SIZE_MB: "500"
+      ALLOWED_EXT: ".bin,.exe,.zip,.tar.gz"
+
+    volumes:
+      - ./portal-upload/public:/app/public
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portal.rule=Host(`upload.localhost`)"
+      - "traefik.http.routers.portal.entrypoints=websecure"
+      - "traefik.http.routers.portal.tls.certresolver=letsencrypt"

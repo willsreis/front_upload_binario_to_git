@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload de Binário</title>
+  <style>
+    body { font-family: Arial; max-width: 500px; margin: 40px auto; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    #status { margin-top: 20px; font-weight: bold; }
+    a { display: inline-block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+  <h2>Upload de Binário para GitHub</h2>
+
+  <a href="/logout">Sair</a>
+
+  <label>Arquivo:</label>
+  <input type="file" id="fileInput">
+
+  <label>Caminho no repositório (ex: dist/app.bin):</label>
+  <input type="text" id="pathInput">
+
+  <label>Branch:</label>
+  <input type="text" id="branchInput" value="main">
+
+  <button onclick="upload()">Enviar</button>
+
+  <div id="status"></div>
+
+  <script>
+    async function upload() {
+      const file = document.getElementById("fileInput").files[0];
+      const path = document.getElementById("pathInput").value;
+      const branch = document.getElementById("branchInput").value;
+
+      if (!file || !path) {
+        alert("Selecione o arquivo e o caminho.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("path", path);
+      formData.append("branch", branch);
+
+      document.getElementById("status").innerText = "Enviando...";
+
+      try {
+        const response = await fetch("/upload", {
+          method: "POST",
+          body: formData
+        });
+
+        const text = await response.text();
+        document.getElementById("status").innerText = text;
+      } catch (e) {
+        document.getElementById("status").innerText = "Erro ao enviar.";
+      }
+    }
+  </script>
+
+</body>
+</html>

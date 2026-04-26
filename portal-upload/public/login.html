@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    body { font-family: Arial; max-width: 400px; margin: 60px auto; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    .error { color: red; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Login (LDAP)</h2>
+  <form method="POST" action="/login">
+    <label>Usuário:</label>
+    <input type="text" name="username" required>
+
+    <label>Senha:</label>
+    <input type="password" name="password" required>
+
+    <button type="submit">Entrar</button>
+  </form>
+
+  <div class="error">
+    <script>
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("error")) {
+        document.write("Usuário ou senha inválidos.");
+      }
+    </script>
+  </div>
+</body>
+</html>
